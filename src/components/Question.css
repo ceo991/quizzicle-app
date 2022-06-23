@@ -61,9 +61,11 @@ hr{
         min-width: 180px;
         height: 25px;
         background-color: transparent;
-        border: 1px solid;
+
         border-radius:8px;
-        transition:border 0.8s;
+        background-color: midnightblue;
+        padding: 15px;
+        color: lightslategray;
         display: flex;
         justify-content:center;
         align-items: center;
