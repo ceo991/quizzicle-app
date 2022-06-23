@@ -274,9 +274,9 @@ function App() {
 }
 
   return (
-    <div>  
+    <div className='App-header'>  
       {setElement()}
-      <h4><a href='https://github.com/ceo991/quizzical-app' style={{color:"black",textDecoration: "none"}}>You can see the source code here</a></h4>
+      <h4><a href='https://github.com/ceo991/quizzicle-app' style={{color:"aliceblue",textDecoration: "none"}}>You can see the source code here</a></h4>
     </div>  
   );
 }

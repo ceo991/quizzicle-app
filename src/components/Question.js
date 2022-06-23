@@ -42,7 +42,7 @@ function Question(props){
 
     return(
         <div className="question-container">
-            <h2 className="question" >{He.decode(props.question)}</h2>
+            <h2 className="question" >{props.index+1}- {He.decode(props.question)}</h2>
             <div className="answers-container">
                 {ans}
             </div>
