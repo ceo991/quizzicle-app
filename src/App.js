@@ -15,10 +15,24 @@ function App() {
   const[numberOfQuestions, setnumberOfQuestions] = useState(0)
   const[category, setCategory] = useState(0)
   const[difficulty, setDifficulty] = useState("")
+  // const categoryRef = useRef()
+  // const difficultyRef = useRef()
+  // const numOfQuestionsRef = useRef()
+  // const formRef = useRef()
 
   useEffect( () => {
     setCorrectAmount( questions.map(question=>question).filter(question=>question.userSelection===question.correctAnswer).length)
   },[questions])
+
+  // useEffect( () => {
+
+  // },[])
+
+  useEffect( () => {
+
+    if(isActive) return
+
+    },[isActive])
 
   const question = questions.map((q,index)=>{
     return <Question
@@ -86,9 +100,9 @@ function App() {
   }
 
   function handleSubmit(event){
+    event.preventDefault();  
     
     if(!isEnded){
-      event.preventDefault();  
       questions.map((question,index)=>{
         let temp_state = [...questions];
         let temp_element = {...question}
@@ -103,6 +117,11 @@ function App() {
     }
 
       setIsEnded(true)
+    }else{
+      setIsEnded(false)
+      setIsActive(false)
+      setQuestions([])
+
     }
   }
 
@@ -112,7 +131,7 @@ function App() {
 
 
     if(value<1){
-      value=1
+      value=0
     }
 
     if(value>50){
@@ -219,7 +238,7 @@ function App() {
             </form>
   }
   }else{
-    return <form className="Main-menu" onSubmit={getQuestions}>
+    return <form className="Main-menu" onSubmit={getQuestions} >
 
       <h2>?Quizzicle?</h2>
 
