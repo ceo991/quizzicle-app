@@ -20,7 +20,7 @@ function Question(props){
                     }
               }
             }else{              
-               styleProp = (props.correctAnswer===answer) ? "red":"lightgray"                
+               styleProp = (props.correctAnswer===answer) ? "#e85f5a":"lightgray"                
             }
         }else{
             styleProp = (props.userSelection===answer ) ? "rgb(175, 203, 230)" : ""
