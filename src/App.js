@@ -267,7 +267,7 @@ function App() {
       <label htmlFor="numofquestions">Enter the number of questions:</label>
       <input type="number" id="numofquestions" onChange={handleQuestionAmount} value={numberOfQuestions}/>
 
-      <button>Play!!!</button>
+      <button id="play-btn">Play!!!</button>
 
   </form>
   }

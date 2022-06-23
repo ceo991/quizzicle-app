@@ -57,6 +57,14 @@ form{
   border-radius: 10px;
 }
 
+#play-btn{
+  padding: 20px;
+  border: none;
+  background-color: orangered;
+  border-radius: 3px;
+  cursor: pointer;
+  color: aliceblue;
+}
 
 .loader {
   border: 16px solid #f3f3f3; 
