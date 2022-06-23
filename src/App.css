@@ -54,11 +54,10 @@
 
 form{
   padding: 10px;
-  border-radius: 10px;
 }
 
 #play-btn{
-  padding: 20px;
+  padding: 15px;
   border: none;
   background-color: orangered;
   border-radius: 3px;

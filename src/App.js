@@ -102,12 +102,7 @@ function App() {
     }
 
       setIsEnded(true)
-    }else{
-      // setIsActive(false)
-      // setIsEnded(false)
-      // setQuestions([]);
     }
-
   }
 
   function handleQuestionAmount(e){
