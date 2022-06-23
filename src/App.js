@@ -1,8 +1,9 @@
 
 import './App.css';
-import React, {useState,useEffect} from 'react';
+import React, {useState,useEffect, useCallback, useRef} from 'react';
 import Question from './components/Question';
 import { v4 as uuidv4 } from 'uuid';
+import ReactCanvasConfetti from "react-canvas-confetti";
 
 
 function App() {
@@ -10,20 +11,15 @@ function App() {
   const[questions,setQuestions] = useState([])
   const[isActive,setIsActive] = useState(false)
   const[isEnded,setIsEnded] = useState(false)
-
+  const[correctAmount, setCorrectAmount] = useState(0)
   const[numberOfQuestions, setnumberOfQuestions] = useState(0)
   const[category, setCategory] = useState(0)
-  const[info, setInfo] = useState({})
   const[difficulty, setDifficulty] = useState("")
 
   useEffect( () => {
-    if(category !== 0 ){
-      fetch(`https://opentdb.com/api_count.php?category=${category}`)
-      .then(res=>res.json())
-      .then(data=>setInfo(data.category_question_count))
-    }
-      
-  },[category])
+    setCorrectAmount( questions.map(question=>question).filter(question=>question.userSelection===question.correctAnswer).length)
+  },[questions])
+
   const question = questions.map((q,index)=>{
     return <Question
       index={index} 
@@ -43,7 +39,14 @@ function App() {
     if(numberOfQuestions>0){
       fetch(`https://opentdb.com/api.php?amount=${numberOfQuestions}&category=${category}&difficulty=${difficulty}&type=multiple`)
       .then(res=>res.json())
-      .then(data=>data.results
+      .then(data=>{
+        if(data.response_code===1){
+          alert("There are not that many questions in the database, please try again")
+          setQuestions([])
+          setIsActive(false)
+          setIsEnded(false)
+        }
+        data.results
       .map((d,index)=>{
         const randomIndex = Math.round(Math.random(0)*d.incorrect_answers.length);
 
@@ -58,11 +61,13 @@ function App() {
           index:index,
           isCorrectlyAnswered :false
         }
-      
+        
         setQuestions(prevQuestion=>[...prevQuestion,formattedData])
+        return true
         }
-      )
+      )}
     )
+
       setIsActive(true)
     }else{
       alert("enter number of questions")
@@ -91,23 +96,24 @@ function App() {
         temp_state[index] = temp_element;   
         setQuestions(temp_state);
       })
+        
+    if(correctAmount === questions.length){
+      fire()
+    }
+
       setIsEnded(true)
     }else{
       // setIsActive(false)
       // setIsEnded(false)
       // setQuestions([]);
     }
+
   }
 
   function handleQuestionAmount(e){
     e.preventDefault()
     let {value} = e.target
-    // if(e.target.value>50){
-    //   e.target.value=50
-    // }
-    // if(e.target.value<1){
-    //   e.target.value=1
-    // }
+
 
     if(value<1){
       value=1
@@ -117,24 +123,6 @@ function App() {
       value=50
     }
 
-   if(difficulty === "easy"){
-      if(value>info.total_easy_question_count){
-
-        value=info.total_easy_question_count      
-      }
-    }
-    else if(difficulty === "medium"){
-      if(value>info.total_medium_question_count){
-
-        value=info.total_medium_question_count     
-      }   
-    }
-    else if(difficulty === "hard"){
-      if(value>info.total_hard_question_count){
-
-        value=info.total_hard_question_count      
-      }
-    }
     setnumberOfQuestions(value)
   }
 
@@ -148,7 +136,79 @@ function App() {
     setDifficulty(e.target.value)
   }
 
+  const refAnimationInstance = useRef(null);
+
+  const canvasStyles = {
+    position: "fixed",
+    pointerEvents: "none",
+    width: "100%",
+    height: "100%",
+    top: 0,
+    left: 0
+  };
+  const getInstance = useCallback((instance) => {
+    refAnimationInstance.current = instance;
+  }, []);
+
+  const makeShot = useCallback((particleRatio, opts) => {
+    refAnimationInstance.current &&
+      refAnimationInstance.current({
+        ...opts,
+        origin: { y: 0.7 },
+        particleCount: Math.floor(200 * particleRatio)
+      });
+  }, []);
+
+  const fire = useCallback(() => {
+    makeShot(0.25, {
+      spread: 26,
+      startVelocity: 55
+    });
+
+    makeShot(0.2, {
+      spread: 60
+    });
+
+    makeShot(0.35, {
+      spread: 100,
+      decay: 0.91,
+      scalar: 0.8
+    });
+
+    makeShot(0.1, {
+      spread: 120,
+      startVelocity: 25,
+      decay: 0.92,
+      scalar: 1.2
+    });
+
+    makeShot(0.1, {
+      spread: 120,
+      startVelocity: 45
+    });
+  }, [makeShot]);
+
+
   function setElement(){
+
+  let style = {
+    color: "initial"
+  }
+
+  if(correctAmount === 0) {
+    style = {
+      color: "red"
+    }
+  }else if(correctAmount < questions.length){
+    style = {
+      color: "orange"
+    }
+  }else if(correctAmount === questions.length){
+    style = {
+      color: "green"
+    }
+  }
+
   if(isActive){
     if(questions.length<=0){
       return <div className="loader-container">
@@ -156,9 +216,10 @@ function App() {
              </div>
     }else{
       return <form className="App" onSubmit={handleSubmit}>
+              <ReactCanvasConfetti refConfetti={getInstance} style={canvasStyles} />
               {question}
               {questions.length>0 && <button className="sbmt-btn" >{ isEnded ? "Play Again" : "Check Answers"}</button>}
-              {isEnded && <span className='result-text'>You answered {questions.map(question=>question).filter(question=>question.userSelection===question.correctAnswer).length}/{questions.length} correctly</span>}       
+              {isEnded && <span className='result-text' style={style}>You answered {correctAmount}/{questions.length} correctly</span>}       
             </form>
   }
   }else{
@@ -215,7 +276,7 @@ function App() {
   return (
     <div>  
       {setElement()}
-      <h4><a href='https://github.com/ceo991/quizzical-app' style={{color:"balck",textDecoration: "none"}}>You can see the source code here</a></h4>
+      <h4><a href='https://github.com/ceo991/quizzical-app' style={{color:"black",textDecoration: "none"}}>You can see the source code here</a></h4>
     </div>  
   );
 }
