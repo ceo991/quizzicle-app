@@ -95,6 +95,7 @@ function App() {
         temp_element.isCorrectlyAnswered = (temp_element.userSelection===temp_element.correctAnswer);        
         temp_state[index] = temp_element;   
         setQuestions(temp_state);
+        return true
       })
         
     if(correctAmount === questions.length){

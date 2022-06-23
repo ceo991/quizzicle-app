@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import He from "he"
 
 function Question(props){
-
     
     const ans = props.answers.map((answer)=>{
         let styleProp = ""
@@ -24,12 +23,12 @@ function Question(props){
                styleProp = (props.correctAnswer===answer) ? "red":"lightgray"                
             }
         }else{
-            styleProp = (props.userSelection===answer ) ? "dodgerblue" : ""
+            styleProp = (props.userSelection===answer ) ? "rgb(175, 203, 230)" : ""
         }
         let style={
             backgroundColor: styleProp,
             cursor: props.isEnded ? "default" :'', 
-            border: props.isEnded ? " 1px solid black" :'' 
+         
         }
 
         return (
@@ -46,7 +45,6 @@ function Question(props){
             <div className="answers-container">
                 {ans}
             </div>
-            <hr />
         </div>
     )
 }
