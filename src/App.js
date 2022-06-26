@@ -149,18 +149,25 @@ function App() {
   }
 
   function handleQuestionAmount(e){
-    e.preventDefault()
+    // e.preventDefault()
     let {value} = e.target
 
+    if(value === "+" || value === "-") {
+      value=0
+    }
 
     if(value<1){
       value=0
     }
-
+    
     if(value>50){
       value=50
     }
-
+    
+    if(value<10 && value.length>1){
+      value = value.slice(1)
+    }
+    
     setnumberOfQuestions(value)
   }
 
