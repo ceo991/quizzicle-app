@@ -4,29 +4,37 @@ import React, {useState,useEffect, useCallback, useRef} from 'react';
 import Question from './components/Question';
 import { v4 as uuidv4 } from 'uuid';
 import ReactCanvasConfetti from "react-canvas-confetti";
+import MainMenuForm from './components/MainMenuForm';
 
 
 function App() {
 
-  const[questions,setQuestions] = useState([])
-  const[isActive,setIsActive] = useState(false)
-  const[isEnded,setIsEnded] = useState(false)
-  const[correctAmount, setCorrectAmount] = useState(0)
-  const[numberOfQuestions, setnumberOfQuestions] = useState(0)
-  const[category, setCategory] = useState(0)
-  const[difficulty, setDifficulty] = useState("")
-  // const categoryRef = useRef()
-  // const difficultyRef = useRef()
-  // const numOfQuestionsRef = useRef()
-  // const formRef = useRef()
+  const [questions,setQuestions] = useState([])
+  const [isActive,setIsActive] = useState(false)
+  const [isEnded,setIsEnded] = useState(false)
+  const [correctAmount, setCorrectAmount] = useState(0)
+  const [count, setCount] = useState(0)
+  const [numberOfQuestions, setnumberOfQuestions] = useState(0)
+  const [category, setCategory] = useState(0)
+  const [difficulty, setDifficulty] = useState("")
+  const [categories, setCategories] = useState([])
 
   useEffect( () => {
     setCorrectAmount( questions.map(question=>question).filter(question=>question.userSelection===question.correctAnswer).length)
   },[questions])
 
-  // useEffect( () => {
 
-  // },[])
+  useEffect( () => {
+    getAvailbleCategories()
+  },[])
+
+  // useEffect( () => {
+  //   console.log(categories)
+  // },[categories])
+
+  useEffect( () => {
+    console.log(count)
+  },[count])
 
   useEffect( () => {
 
@@ -45,9 +53,17 @@ function App() {
       userSelection={q.userSelection}
       isCorrect = {q.isCorrectlyAnswered}
       isEnded={isEnded}
+      count={count}
     />
   })
   
+  async function  getAvailbleCategories() {
+    const data = await fetch("https://opentdb.com/api_category.php")
+    const categories = await data.json()
+    const categoriesArr = categories.trivia_categories
+    setCategories(categoriesArr)
+  }
+
   function getQuestions(event){
     event.preventDefault();
     if(numberOfQuestions>0){
@@ -59,6 +75,7 @@ function App() {
           setQuestions([])
           setIsActive(false)
           setIsEnded(false)
+          setCount(0)
         }
         data.results
       .map((d,index)=>{
@@ -75,13 +92,14 @@ function App() {
           index:index,
           isCorrectlyAnswered :false
         }
-        
         setQuestions(prevQuestion=>[...prevQuestion,formattedData])
         return true
         }
       )}
     )
-
+      setnumberOfQuestions(0)
+      setCategory("")
+      setDifficulty("")
       setIsActive(true)
     }else{
       alert("enter number of questions")
@@ -91,6 +109,9 @@ function App() {
 
   function setAnswer(ans,index){
     if(!isEnded){
+      if(count < 1){
+        setCount(prevCount=>prevCount+1)
+      }
       let temp_state = [...questions];
       let temp_element = { ...temp_state[index] };
       temp_element.userSelection = ans;
@@ -111,7 +132,9 @@ function App() {
         setQuestions(temp_state);
         return true
       })
-        
+      if(count < 1){
+        setCount(prevCount=>prevCount+1)
+      }
     if(correctAmount === questions.length){
       fire()
     }
@@ -121,7 +144,7 @@ function App() {
       setIsEnded(false)
       setIsActive(false)
       setQuestions([])
-
+      setCount(0)
     }
   }
 
@@ -238,53 +261,18 @@ function App() {
             </form>
   }
   }else{
-    return <form className="Main-menu" onSubmit={getQuestions} >
-
-      <h2>?Quizzicle?</h2>
-
-      <label htmlFor="category-select">Choose a Category:</label>
-      <select name="category" id="category-select" value={category} onChange={handleCategorySelection}>
-          <option value="">Any Category</option>
-          <option value="9">General Knowledge</option>
-          <option value="10">Entertainment: Books</option>
-          <option value="11">Entertainment: Film</option>
-          <option value="12">Entertainment: Music</option>
-          <option value="13">Entertainment: Musicals & Theatres</option>
-          <option value="14">Entertainment: Television</option>
-          <option value="15">Entertainment: Video Games</option>
-          <option value="16">Entertainment: Board Games</option>
-          <option value="17">Science & Nature</option>
-          <option value="18">Science: Computers</option>
-          <option value="19">Science: Mathematics</option>
-          <option value="20">Mythology</option>
-          <option value="21">Sports</option>
-          <option value="22">Geography</option>
-          <option value="23">History</option>
-          <option value="24">Politics</option>
-          <option value="25">Art</option>
-          <option value="26">Celebrities</option>
-          <option value="27">Animals</option>
-          <option value="28">Vehicles</option>
-          <option value="29">Entertainment: Comics</option>
-          <option value="30">Science: Gadgets</option>
-          <option value="31">Entertainment: Japanese Anime & Manga</option>
-          <option value="32">Entertainment: Cartoon & Animations</option>
-      </select>
-
-      <label htmlFor="difficulty-select">Choose a Difficulty:</label>
-      <select name="difficulty" id="difficulty-select" value={difficulty} onChange={handleDifficultySelection}>
-          <option value="">Any Difficulty</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-      </select>
-
-      <label htmlFor="numofquestions">Enter the number of questions:</label>
-      <input type="number" id="numofquestions" onChange={handleQuestionAmount} value={numberOfQuestions}/>
-
-      <button id="play-btn">Play!!!</button>
-
-  </form>
+    return (
+        <MainMenuForm
+          getQuestions={getQuestions}
+          category={category}
+          handleCategorySelection={handleCategorySelection}
+          difficulty={difficulty}
+          handleDifficultySelection={handleDifficultySelection}
+          handleQuestionAmount={handleQuestionAmount}
+          numberOfQuestions={numberOfQuestions}
+          categories={categories}
+        />
+      )
   }
 }
 

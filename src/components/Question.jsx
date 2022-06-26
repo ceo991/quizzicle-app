@@ -1,9 +1,12 @@
 import './Question.css'
 import { v4 as uuidv4 } from 'uuid';
 import He from "he"
+import {motion} from "framer-motion"
+
 
 function Question(props){
-    
+ 
+     
     const ans = props.answers.map((answer)=>{
         let styleProp = ""
         if(props.isEnded){
@@ -39,13 +42,18 @@ function Question(props){
         )
     })
 
+    const variants = {
+        hidden: { scale: 0.25 },
+        visible: { scale: 1 },
+      }
+
     return(
-        <div className="question-container">
+        <motion.div className="question-container"  initial="hidden" animate="visible" variants={props.count<1?variants:{}}>
             <h2 className="question" >{props.index+1}- {He.decode(props.question)}</h2>
-            <div className="answers-container">
+            <motion.div className="answers-container" initial={props.count<1?"hidden":""}  animate={props.count<1?"visible":""} variants={props.count<1?variants:{}}>
                 {ans}
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     )
 }
 
