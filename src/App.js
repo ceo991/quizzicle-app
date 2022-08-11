@@ -18,7 +18,7 @@ function App() {
   const [category, setCategory] = useState(0)
   const [difficulty, setDifficulty] = useState("")
   const [categories, setCategories] = useState([])
-
+  
   useEffect( () => {
     setCorrectAmount( questions.map(question=>question).filter(question=>question.userSelection===question.correctAnswer).length)
   },[questions])
@@ -107,8 +107,9 @@ function App() {
   }
 
 
-  function setAnswer(ans,index){
+  function setAnswer(ans, index){
     if(!isEnded){
+
       if(count < 1){
         setCount(prevCount=>prevCount+1)
       }
@@ -116,7 +117,14 @@ function App() {
       let temp_element = { ...temp_state[index] };
       temp_element.userSelection = ans;
       temp_state[index] = temp_element;
-      setQuestions(temp_state);
+      setQuestions(prevState => {
+        if(prevState[index].userSelection=== temp_state[index].userSelection){
+          temp_element.userSelection = "";
+          temp_state[index] = temp_element;
+          return temp_state
+        }
+        return temp_state
+      });
     }
   }
 
